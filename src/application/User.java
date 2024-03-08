@@ -5,6 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Class: User
+ * 
+ * A class for user, records the user's password for login. Have the rooms the user in and friends the user have.
+ */
 public class User {
     public static final Random RANDOM = new SecureRandom();
 
@@ -73,6 +78,14 @@ public class User {
     public int getHashedPassword() {
         return hashedPassword;
     }
+    
+    /**
+     * check if the input password equals to the password
+     * 
+     * @param password
+     *          the password that getting checked
+     * @return return true if the password equals hashedPassword after adding salting and hashing
+     */
     public boolean checkPassword(String password){
         return (password + salt).hashCode() == hashedPassword;
     }
