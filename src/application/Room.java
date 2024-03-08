@@ -5,9 +5,9 @@ import java.util.List;
 
 public class Room {
 	
-	List<String> objects;
+	private List<String> objects;
 	
-	List<Message> contents;
+	private List<Message> contents;
 	
 	Room(){
 		this.objects = new ArrayList<String>();
