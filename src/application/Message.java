@@ -5,20 +5,18 @@ import java.util.Date;
 public class Message {
 	
 	private String content;
-	private String object;
+	private User user;
 	private long timestamp;
 	Date now = new Date();
 	
 	Message(){
-		this.content = "None";
-		this.object = "None";
-		this.timestamp = now.getTime();
+		this("None", null);
 	}
 	
-	Message(String content, String object, long timestamp){
+	Message(String content, User user){
 		this.content = content;
-		this.object = object;
-		this.timestamp = timestamp;
+		this.user = user;
+		this.timestamp = now.getTime();
 	}
 	
 	public String getContent() {
@@ -29,12 +27,12 @@ public class Message {
 		this.content = content;
 	}
 	
-	public String getObject() {
-		return object;
+	public User getUser() {
+		return user;
 	}
 	
-	public void setObject(String object) {
-		this.object = object;
+	public void setUser(User user) {
+		this.user = user;
 	}
 	
 	public long getTime() {
@@ -50,4 +48,19 @@ public class Message {
 		this.object = object;
 		this.timestamp = timestamp;
 	}*/
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj.getClass() != this.getClass()){
+			return false;
+		}
+
+		Message msg = (Message) obj;
+		return content == msg.getContent() && user.equals(msg.getUser()) && timestamp == msg.timestamp;
+	}
+
+	@Override
+	public String toString() {
+		return user + " [" + timestamp + "]: " + content; 
+	}
 }
