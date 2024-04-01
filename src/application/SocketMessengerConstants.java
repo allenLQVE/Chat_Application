@@ -2,7 +2,7 @@ package application;
 
 public interface SocketMessengerConstants {
 
-    Integer x = new Integer(null); // just for the warning
+    Integer x = null; // just for the warning
     // WARNING THE FOR TESTING PART MAY NEEDS TO CHANGE
 
     // address for multicast datagrams
