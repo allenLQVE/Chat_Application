@@ -11,9 +11,9 @@ public class MessageSender implements Runnable{
     private Socket clientSocket;
     private String msg;
 
-    public MessageSender(Socket socket, String sender, String msg){
+    public MessageSender(Socket socket, String sender, String msg, int send_port, int listen_port){
         clientSocket = socket;
-        this.msg = sender + MESSAGE_SEPARATOR + msg;
+        this.msg = sender + MESSAGE_SEPARATOR + msg + MESSAGE_SEPARATOR + send_port + MESSAGE_SEPARATOR + listen_port;
     }
 
     @Override

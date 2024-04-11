@@ -47,10 +47,10 @@ public class MessageReceiver implements Runnable{
                 // tokenize the msg, the first part is sender name and second part is msg
                 StringTokenizer tokenizer = new StringTokenizer(msg, MESSAGE_SEPARATOR);
 
-                // if the msg contains sender and msg
-                if(tokenizer.countTokens() == 2){
-                    // the first token is sender name, second is msg
-                    messageListener.messageReceived(tokenizer.nextToken(), tokenizer.nextToken());
+                // if the msg contains sender, msg, and ports
+                if(tokenizer.countTokens() == 4){
+                    // the first token is sender name, second is msg, follows by 2 port numbers
+                    messageListener.messageReceived(tokenizer.nextToken(), tokenizer.nextToken(), Integer.valueOf(tokenizer.nextToken()), Integer.valueOf(tokenizer.nextToken()));
                 } else {
                     // if the msg is equal to the disconnect string
                     if(msg.equalsIgnoreCase(MESSAGE_SEPARATOR + DISCONNECT_STRING)){
@@ -66,6 +66,4 @@ public class MessageReceiver implements Runnable{
             e.printStackTrace();
         }
     }
-
-    
 }

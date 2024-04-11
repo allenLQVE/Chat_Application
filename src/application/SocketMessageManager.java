@@ -24,7 +24,7 @@ public class SocketMessageManager implements MessageManager{
     }
 
     @Override
-    public void connect(MessageListener listener) {
+    public void connect(MessageListener listener, int listen_port) {
         // return if already connected
         if(isConnected){
             return;
@@ -34,7 +34,7 @@ public class SocketMessageManager implements MessageManager{
             clienSocket = new Socket(InetAddress.getByName(serverAddress), SERVER_PORT);
 
             // create runnable for receiveing messages
-            receiver = new PacketReceiver(listener);
+            receiver = new PacketReceiver(listener, listen_port);
             serverExcutor.execute(receiver);
             isConnected = true;
         } catch (IOException e) {
@@ -51,7 +51,7 @@ public class SocketMessageManager implements MessageManager{
 
         try {
             // notify server for disconnection
-            Runnable disconnecter = new MessageSender(clienSocket, "", DISCONNECT_STRING);
+            Runnable disconnecter = new MessageSender(clienSocket, "", DISCONNECT_STRING, 0, 0);
 
             @SuppressWarnings("rawtypes")
             Future disconnecting = serverExcutor.submit(disconnecter);
@@ -67,13 +67,13 @@ public class SocketMessageManager implements MessageManager{
     }
 
     @Override
-    public void sendMessage(String from, String msg) {
+    public void sendMessage(String from, String msg, int multicast_send_port, int multicast_listen_port) {
         // return if not connected
         if(!isConnected){
             return;
         }
 
-        serverExcutor.execute(new MessageSender(clienSocket, from, msg));
+        serverExcutor.execute(new MessageSender(clienSocket, from, msg, multicast_send_port, multicast_listen_port));
     }
     
 }
