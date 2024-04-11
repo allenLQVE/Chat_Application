@@ -24,6 +24,7 @@ public class MulticastSender implements Runnable{
 
     @Override
     public void run() {
+        // push message from server to all the user in the group
         try {
             // create the socket for sending the msg
             DatagramSocket socket = new DatagramSocket(send_port);

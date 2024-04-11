@@ -18,6 +18,7 @@ public class MessageSender implements Runnable{
 
     @Override
     public void run() {
+        // send the message from user to the server
         try {
             @SuppressWarnings("resource")
             Formatter output = new Formatter(clientSocket.getOutputStream());
