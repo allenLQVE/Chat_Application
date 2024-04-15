@@ -33,7 +33,9 @@ public class MessageReceiver implements Runnable{
     public void run() {
         String msg;
 
+        // listen for incoming message
         while(isListening){
+            // check if receive any message, timeout after 5s
             try {
                 msg = input.readLine();
             } catch (SocketTimeoutException e) {
@@ -43,14 +45,15 @@ public class MessageReceiver implements Runnable{
                 break;
             }
 
+            // if message recieved
             if(msg != null){
-                // tokenize the msg, the first part is sender name and second part is msg
+                // tokenize the msg, seperate by the separator
                 StringTokenizer tokenizer = new StringTokenizer(msg, MESSAGE_SEPARATOR);
 
-                // if the msg contains sender and msg
-                if(tokenizer.countTokens() == 2){
-                    // the first token is sender name, second is msg
-                    messageListener.messageReceived(tokenizer.nextToken(), tokenizer.nextToken());
+                // if the msg contains sender, msg, and 2 ports
+                if(tokenizer.countTokens() == 4){
+                    // the first token is sender name, second is msg, follows by 2 port numbers
+                    messageListener.messageReceived(tokenizer.nextToken(), tokenizer.nextToken(), Integer.valueOf(tokenizer.nextToken()), Integer.valueOf(tokenizer.nextToken()));
                 } else {
                     // if the msg is equal to the disconnect string
                     if(msg.equalsIgnoreCase(MESSAGE_SEPARATOR + DISCONNECT_STRING)){
@@ -60,12 +63,11 @@ public class MessageReceiver implements Runnable{
             }
         }
 
+        // termination
         try {
             input.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-    
 }

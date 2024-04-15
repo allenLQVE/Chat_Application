@@ -38,7 +38,9 @@ public class Server implements MessageListener{
     }
 
     // send a message to all the clients
-    public void messageReceived(String sender, String msg){
-        serverExecutor.execute(new MulticastSender((sender + MESSAGE_SEPARATOR + msg).getBytes()));
+    public void messageReceived(String sender, String msg, int multicast_send_port, int multicast_listen_port){
+        System.out.println(sender + " :" + msg + " from port " + multicast_send_port + " to port " + multicast_listen_port);
+        msg = sender + MESSAGE_SEPARATOR + msg + MESSAGE_SEPARATOR + multicast_send_port + MESSAGE_SEPARATOR + multicast_listen_port;
+        serverExecutor.execute(new MulticastSender((msg).getBytes(), multicast_send_port, multicast_listen_port));
     }
 }

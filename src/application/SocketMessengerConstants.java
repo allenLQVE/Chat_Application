@@ -2,9 +2,6 @@ package application;
 
 public interface SocketMessengerConstants {
 
-    Integer x = new Integer(null); // just for the warning
-    // WARNING THE FOR TESTING PART MAY NEEDS TO CHANGE
-
     // address for multicast datagrams
     public static final String MULTICAST_ADDRESS = "239.0.0.1"; // address for testing
 

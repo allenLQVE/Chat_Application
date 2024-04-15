@@ -5,8 +5,9 @@ public interface MessageManager {
      * Connect to the server and route the incoming messages to the listener
      * 
      * @param listener
+     * @param listen_port
      */
-    public void connect(MessageListener listener);
+    public void connect(MessageListener listener, int listen_port);
 
     /**
      * disconnect from the server and stop routing
@@ -16,10 +17,12 @@ public interface MessageManager {
     public void disconnect(MessageListener listener);
 
     /**
-     * Send the msg to the server
+     * Send the msg to the server, and msg pushed from server to users
      * 
      * @param from
      * @param msg
+     * @param multicast_send_port
+     * @param multicast_listen_port
      */
-    public void sendMessage(String from, String msg);
+    public void sendMessage(String from, String msg, int multicast_send_port, int multicast_listen_port);
 }

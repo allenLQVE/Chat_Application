@@ -3,7 +3,7 @@ package application;
 import static application.SocketMessengerConstants.MESSAGE_SEPARATOR;
 import static application.SocketMessengerConstants.MESSAGE_SIZE;
 import static application.SocketMessengerConstants.MULTICAST_ADDRESS;
-import static application.SocketMessengerConstants.MULTICAST_LISTENING_PORT;
+// import static application.SocketMessengerConstants.MULTICAST_LISTENING_PORT;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -18,12 +18,13 @@ public class PacketReceiver implements Runnable{
     private InetAddress muticastGroup; // inetaddress for multicast group
     private boolean isListening = true;
 
-    public PacketReceiver(MessageListener listener){
+    public PacketReceiver(MessageListener listener, int listen_port){
         this.listener = listener;
 
         // connect mulicast socket
         try {
-            multicastSocket = new MulticastSocket(MULTICAST_LISTENING_PORT);
+            multicastSocket = new MulticastSocket(listen_port);
+            // multicastSocket = new MulticastSocket(MULTICAST_LISTENING_PORT);
 
             muticastGroup = InetAddress.getByName(MULTICAST_ADDRESS); // get InetAddress of multicast group
 
@@ -57,8 +58,8 @@ public class PacketReceiver implements Runnable{
             msg = msg.trim();
 
             StringTokenizer tokenizer = new StringTokenizer(msg, MESSAGE_SEPARATOR);
-            if(tokenizer.countTokens() == 2){
-                listener.messageReceived(tokenizer.nextToken(), tokenizer.nextToken());
+            if(tokenizer.countTokens() == 4){
+                listener.messageReceived(tokenizer.nextToken(), tokenizer.nextToken(), Integer.valueOf(tokenizer.nextToken()), Integer.valueOf(tokenizer.nextToken()));
             }
         }
 
