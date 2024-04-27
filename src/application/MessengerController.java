@@ -89,7 +89,7 @@ public class MessengerController {
         List<Button> roomBtns = new ArrayList<Button>();
         for (Room room : user.getRooms()) {
             Button roomBtn = new Button(room.getName());
-            roomBtn.setStyle("-fx-border:none -fx-background-color:trabsparent");         
+            roomBtn.setStyle("-fx-border:none; -fx-background-color:trabsparent;");         
             roomBtn.setOnMouseClicked(e -> openChatRoom(room));
             roomBtns.add(roomBtn);
         }
