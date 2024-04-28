@@ -69,6 +69,6 @@ public class Room {
 	
 	@Override
 	public String toString() {
-		return "Room - " + name + ": " + users;
+		return "Room - " + name + ": " + port;
 	}
 }

@@ -14,7 +14,7 @@
 
 <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MessengerController">
    <children>
-      <BorderPane fx:id="loginPane" prefHeight="294.0" prefWidth="440.0">
+      <BorderPane fx:id="loginPane" prefHeight="294.0" prefWidth="440.0" visible="false">
          <top>
             <Label prefHeight="63.0" prefWidth="84.0" text="Login" textAlignment="CENTER" BorderPane.alignment="CENTER">
                <font>
@@ -82,20 +82,31 @@
             <ListView fx:id="roomList" prefHeight="354.0" prefWidth="598.0" BorderPane.alignment="CENTER" />
          </center>
          <bottom>
-            <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-              <buttons>
-                <Button fx:id="addBtn" mnemonicParsing="false" onAction="#addRoom" text="Add Room">
+            <BorderPane prefHeight="38.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+               <center>
+                  <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                    <buttons>
+                        <Button fx:id="removeBtn" mnemonicParsing="false" onAction="#removeRoom" text="Remove Room">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Button>
+                      <Button fx:id="addBtn" mnemonicParsing="false" onAction="#addRoom" text="Add Room">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Button>
+                    </buttons>
+                  </ButtonBar>
+               </center>
+               <left>
+                  <Button fx:id="logOutBtn" mnemonicParsing="false" onAction="#logOut" prefHeight="38.0" prefWidth="79.0" text="LogOut" BorderPane.alignment="CENTER">
                      <font>
                         <Font size="16.0" />
                      </font>
                   </Button>
-                  <Button fx:id="removeBtn" mnemonicParsing="false" onAction="#removeRoom" text="Remove Room">
-                     <font>
-                        <Font size="16.0" />
-                     </font>
-                  </Button>
-              </buttons>
-            </ButtonBar>
+               </left>
+            </BorderPane>
          </bottom></BorderPane>
    </children>
 </StackPane>
