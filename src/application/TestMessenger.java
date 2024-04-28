@@ -34,6 +34,9 @@ public class TestMessenger {
         this.start(managers);
     }
 
+    /**
+     * login a dumy user
+     */
     public void login(){
         user = new User("Allen", "test");
         ArrayList<Room> rooms = new ArrayList<Room>();
