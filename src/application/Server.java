@@ -11,6 +11,11 @@ import static application.SocketMessengerConstants.*;
 public class Server implements MessageListener{
     private ExecutorService serverExecutor; // excutor for the server
 
+    public static void main(String[] args){
+        Server server = new Server();
+        server.startServer();
+    }
+
     public void startServer(){
         serverExecutor = Executors.newCachedThreadPool(); // create the new executor for the server
 
