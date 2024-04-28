@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
@@ -44,11 +44,23 @@
             </Label>
          </top>
          <center>
-            <ScrollPane hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-               <content>
-                  <ListView fx:id="roomList" prefHeight="354.0" prefWidth="598.0" />
-               </content>
-            </ScrollPane>
-         </center></BorderPane>
+            <ListView fx:id="roomList" prefHeight="354.0" prefWidth="598.0" BorderPane.alignment="CENTER" />
+         </center>
+         <bottom>
+            <ButtonBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+              <buttons>
+                <Button fx:id="addBtn" mnemonicParsing="false" onAction="#addRoom" text="Add Room">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="removeBtn" mnemonicParsing="false" onAction="#removeRoom" text="Remove Room">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Button>
+              </buttons>
+            </ButtonBar>
+         </bottom></BorderPane>
    </children>
 </StackPane>

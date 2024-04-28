@@ -64,7 +64,7 @@ public class Room {
 		}
 
 		Room room = (Room) obj;
-		return room.getPort() == port;
+		return (room.getPort() == port) || (room.getName().equals(name));
 	}
 	
 	@Override

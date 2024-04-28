@@ -6,7 +6,6 @@ import java.util.Scanner;
 
 public class TestMessenger {
 
-    // private String userName;
     private MessageListener listener;
     private boolean isConnected = true;
 
@@ -16,12 +15,6 @@ public class TestMessenger {
 
     // for connceting all rooms
     private ArrayList<Integer> listen_ports = new ArrayList<Integer>(Arrays.asList(5555,5556));
-    private ArrayList<Integer> send_ports = new ArrayList<Integer>(Arrays.asList(5554,5553));
-    
-    // for connecting single room
-    private int listen_port = 5555;
-    private int send_port = 5554;
-    private int currRoom;
 
     public static void main(String[] args) {
         TestMessenger testMessenger = new TestMessenger();
@@ -38,21 +31,16 @@ public class TestMessenger {
             managers.add(manager);
         }
 
-        TestMessenger testMessenger = new TestMessenger();
-        testMessenger.start(managers);
-
-        // connect to one room at a time
-        // MessageManager manager = new SocketMessageManager("localhost");
-
-        // TestMessenger testMessenger = new TestMessenger();
-        // testMessenger.start(manager);
+        this.start(managers);
     }
 
     public void login(){
-        // TODO: login a user
-
-        // user for test
         user = new User("Allen", "test");
+        ArrayList<Room> rooms = new ArrayList<Room>();
+        for (int i = 0; i < 2; i++) {
+            rooms.add(new Room("room " + i, listen_ports.get(i)));
+        }
+        user.setRooms(rooms);
     }
 
     /**
@@ -91,47 +79,7 @@ public class TestMessenger {
                     System.out.println("Sending message to room");
                     int room = keyboard.nextInt();
                     keyboard.nextLine();
-                    managers.get(room).sendMessage(user.getName(), input, send_ports.get(room), listen_ports.get(room));
-            }
-        }
-
-        keyboard.close();
-    }
-
-    /**
-     * Create a process to handle actions from user.
-     * Connect only to the selected room.
-     * Can only connect to one room at a time.
-     * 
-     * @param MessageManager manager that handle message and connect/disconnect
-     */
-    @SuppressWarnings("unused")
-    private void start(MessageManager manager) {
-        listener = new MyMessageListener();
-
-        Scanner keyboard = new Scanner(System.in);
-
-        while(isConnected){
-            System.out.println("Please input text:");
-            String input = keyboard.nextLine();
-
-            switch (input) {
-                case "connect":
-                    System.out.println("Connect to room");
-                    currRoom = keyboard.nextInt();
-                    keyboard.nextLine();
-                    
-                    manager.connect(listener, listen_ports.get(currRoom));
-                    
-                    System.out.println("Connected to room" + currRoom);
-                    // System.out.println("Please input user name");
-                    // userName = keyboard.nextLine();
-                    break;
-                case "disconnect":
-                    manager.disconnect(listener);
-                    isConnected = false;
-                default:
-                    manager.sendMessage(user.getName(), input, send_ports.get(currRoom), listen_ports.get(currRoom));
+                    managers.get(room).sendMessage(user.getName(), input, 0, listen_ports.get(room));
             }
         }
 
