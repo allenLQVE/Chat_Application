@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -68,8 +69,7 @@ public class MessengerController {
     // TODO: array for testing, should be replace by database
     private ArrayList<User> userDB;
     private ArrayList<Room> roomDB;
-    private final int TESTUSER = 0;
-
+ 
     /**
      * create user and room db for testing
      */
@@ -87,10 +87,13 @@ public class MessengerController {
             room.addUser(user3);
             roomDB.add(room);
         }
-        
-        user1.setRooms(roomDB);
-        user2.setRooms(roomDB);
-        user3.setRooms(roomDB);
+
+        user1.setRooms(new ArrayList<Room>(roomDB));
+        user2.setRooms(new ArrayList<Room>(roomDB));
+        user3.setRooms(new ArrayList<Room>(roomDB));
+
+        user2.removeRoom(roomDB.get(1));
+        roomDB.get(1).removeUser(user2);
 
         userDB.add(user1);
         userDB.add(user2);
@@ -108,11 +111,12 @@ public class MessengerController {
         userName = userNameInput.getText();
         pwd = passwordInput.getText();
 
-        // TODO: login user, find user by using user name from DB then check if pwd is correct
-        // if login success, login user and connect to the server
+        // TODO: should be replaced with real database
         createDumyDB();
-        // user = this.login(userName, pwd);
-        user = userDB.get(TESTUSER);
+
+        user = this.login(userName, pwd);
+
+        // if login success, login user and connect to the server
         if(user == null){
             // if login failed, ask user to re-enter the password
             passwordInput.setText("");
@@ -141,6 +145,9 @@ public class MessengerController {
         return null;
     }
 
+    /**
+     * connect to the server
+     */
     private void connect() {
         // connect to mutiple rooms at once
         managers = new Hashtable<String, MessageManager>();
@@ -178,8 +185,6 @@ public class MessengerController {
      * @param room
      */
     private void openChatRoom(Room room) {
-        // TODO: load message from the room and allow user to return, send new messeage, and show who is in the room
-        
         currRoom = room;
         
         // set up the chat panel
@@ -214,10 +219,36 @@ public class MessengerController {
             int port = Integer.parseInt(option.get());
 
             // TODO: if room exist add the room to user, else create new room
-            // Room room = new Room("name", port);
-            // user.addRoom(room);
-            // ObservableList<Button> rooms = roomList.getItems();
+            Room newRoom = null;
+            for (Room room : roomDB) {
+                // if room already exist return
+                if(user.getRooms().contains(room)){
+                    return;
+                }
+
+                // add the new room if the room already exist
+                if(room.getPort() == port){
+                    newRoom = room;
+                }
+            }
+
+            // get create a new room and save to DB
+            if(newRoom == null){
+                dialog = new TextInputDialog();
+                dialog.setHeaderText("Please enter the name for the room.");
+                dialog.setTitle("Add Room");
+                option = dialog.showAndWait();
+
+                String roomName = option.get();
                 
+                newRoom = new Room(roomName, port);
+            }
+            
+            user.addRoom(newRoom);
+            newRoom.addUser(user);
+
+            // update main panel
+            showMainPane();
         } catch (Exception e) {
             e.printStackTrace();
         } 
@@ -255,8 +286,6 @@ public class MessengerController {
     // Methods for Login Panel ---------------------------------------------------
     /**
      * Display the main menu
-     * 
-     * @param user
      */
     private void showMainPane() {
         loginPane.setVisible(false);
