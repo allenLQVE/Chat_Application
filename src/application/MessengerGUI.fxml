@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
@@ -34,7 +35,41 @@
             </Pane>
          </center>
       </BorderPane>
-      <BorderPane fx:id="chatPane" prefHeight="200.0" prefWidth="200.0" visible="false" />
+      <BorderPane fx:id="chatPane" prefHeight="200.0" prefWidth="200.0" visible="false">
+         <right>
+            <ListView fx:id="userList" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+         </right>
+         <top>
+            <BorderPane prefHeight="35.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+               <left>
+                  <Button fx:id="returnBtn" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#returnToMain" prefHeight="30.0" prefWidth="30.0" text="&lt;" BorderPane.alignment="CENTER">
+                     <font>
+                        <Font name="System Bold" size="16.0" />
+                     </font>
+                  </Button>
+               </left>
+               <center>
+                  <Label fx:id="roomLabel" textAlignment="CENTER" BorderPane.alignment="CENTER">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+               </center>
+            </BorderPane>
+         </top>
+         <center>
+            <TextArea fx:id="msgTextDisplay" editable="false" prefHeight="336.0" prefWidth="432.0" BorderPane.alignment="CENTER" />
+         </center>
+         <bottom>
+            <BorderPane prefHeight="27.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+               <center>
+                  <TextField fx:id="msgTextInput" prefHeight="26.0" prefWidth="530.0" BorderPane.alignment="CENTER" />
+               </center>
+               <right>
+                  <Button fx:id="sendMsgBtn" mnemonicParsing="false" onAction="#sendMsg" text="Send" BorderPane.alignment="CENTER" />
+               </right>
+            </BorderPane>
+         </bottom></BorderPane>
       <BorderPane fx:id="mainPane" prefHeight="200.0" prefWidth="200.0" visible="false">
          <top>
             <Label fx:id="nameLabel" prefHeight="18.0" prefWidth="612.0" BorderPane.alignment="CENTER">

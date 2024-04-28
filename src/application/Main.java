@@ -23,6 +23,7 @@ public class Main extends Application {
 				System.out.println("exit");
 				Platform.exit();
 			});
+			primaryStage.setTitle("Chat Application");
 			primaryStage.show();
 		} catch(Exception e) {
 			e.printStackTrace();

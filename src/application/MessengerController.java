@@ -5,10 +5,8 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
-import java.util.Scanner;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -16,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
@@ -26,6 +25,18 @@ public class MessengerController {
     // chat panel components
     @FXML
     private BorderPane chatPane;
+    @FXML
+    private Button returnBtn;
+    @FXML
+    private ListView<String> userList;
+    @FXML
+    private Label roomLabel;
+    @FXML
+    private TextArea msgTextDisplay;
+    @FXML
+    private TextField msgTextInput;
+    @FXML
+    private Button sendMsgBtn;
 
     // login panel components
     @FXML
@@ -50,9 +61,43 @@ public class MessengerController {
     private String userName;
     private String pwd;
     private User user;
-    private MessageListener listener;
+    private Room currRoom;
+    private MessageListener listener  = new MyMessageListener();
     private Dictionary<String, MessageManager> managers;
 
+    // TODO: array for testing, should be replace by database
+    private ArrayList<User> userDB;
+    private ArrayList<Room> roomDB;
+    private final int TESTUSER = 0;
+
+    /**
+     * create user and room db for testing
+     */
+    private void createDumyDB(){
+        User user1 = new User("Allen", "1234");
+        User user2 = new User("Bob", "1234");
+        User user3 = new User("Cirby", "1234");
+
+        userDB = new ArrayList<User>();
+        roomDB = new ArrayList<Room>();
+        for (int i = 0; i < 3; i++) {
+            Room room = new Room("room " + i, i + 1000);
+            room.addUser(user1);
+            room.addUser(user2);
+            room.addUser(user3);
+            roomDB.add(room);
+        }
+        
+        user1.setRooms(roomDB);
+        user2.setRooms(roomDB);
+        user3.setRooms(roomDB);
+
+        userDB.add(user1);
+        userDB.add(user2);
+        userDB.add(user3);
+    }
+
+    // Methods for Main Panel ---------------------------------------------------
     /**
      * Login user then connect the user to the server
      * 
@@ -65,22 +110,35 @@ public class MessengerController {
 
         // TODO: login user, find user by using user name from DB then check if pwd is correct
         // if login success, login user and connect to the server
-        ArrayList<Room> rooms = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
-            rooms.add(new Room("room " + i, i + 1000));
+        createDumyDB();
+        // user = this.login(userName, pwd);
+        user = userDB.get(TESTUSER);
+        if(user == null){
+            // if login failed, ask user to re-enter the password
+            passwordInput.setText("");
+            Alert alert = new Alert(AlertType.ERROR, "Incorrect Password!");
+            alert.show();
+        } else {
+            this.connect();
+            this.showMainPane();
         }
-        
-        user = new User("test", "test");
-        user.setRooms(rooms);
-        
-        this.connect();
-        this.showMainPane();
+    }
 
-        // if login failed, ask user to re-enter the password
-        passwordInput.setText("");
-        Alert alert = new Alert(AlertType.ERROR, "Incorrect Password!");
-        alert.show();
-        
+    /**
+     * check if user in the database
+     * 
+     * @param userName
+     * @param pwd
+     * @return
+     */
+    private User login(String userName, String pwd) {
+        // TODO: change to use DB later
+        for (User user : userDB) {
+            if(user.getName().equals(userName) && user.checkPassword(pwd)){
+                return user;
+            }
+        }
+        return null;
     }
 
     private void connect() {
@@ -88,43 +146,30 @@ public class MessengerController {
         managers = new Hashtable<String, MessageManager>();
         for (int i = 0; i < user.getRooms().size(); i ++) {
             MessageManager manager = new SocketMessageManager("localhost");
+
             manager.connect(listener, user.getRooms().get(i).getPort());
             managers.put(user.getRooms().get(i).getName(), manager);
         }
-
-        listener = new MyMessageListener();
     }
 
     private class MyMessageListener implements MessageListener{
         @Override
         public void messageReceived(String sender, String msg, int send_port, int listen_port) {
-            // TODO: add new message to the room
+            // if the currRoom is the room receving the msg
+            if(currRoom != null && currRoom.getPort() == listen_port){
+                currRoom.addContent(sender + ": " + msg);
+                msgTextDisplay.appendText(sender + ": " + msg + "\n");
+            } else {
+                for (Room room : user.getRooms()) {
+                    if(room.getPort() == listen_port){
+                        room.addContent(sender + ": " + msg);
+                    }
+                }
+            }
+            
             System.out.println(sender + ": " + msg);
         }
         
-    }
-
-    /**
-     * Display the main menu
-     * 
-     * @param user
-     */
-    private void showMainPane() {
-        loginPane.setVisible(false);
-        mainPane.setVisible(true);
-
-        nameLabel.setText("Current User: " + user.getName());
-        
-        // add the rooms to the list view
-        List<Button> roomBtns = new ArrayList<Button>();
-        for (Room room : user.getRooms()) {
-            Button roomBtn = new Button(room.getName());
-            roomBtn.setStyle("-fx-border:none; -fx-background-color:transparent;");         
-            roomBtn.setOnMouseClicked(e -> openChatRoom(room));
-            roomBtns.add(roomBtn);
-        }
-
-        roomList.setItems(FXCollections.observableArrayList(roomBtns));
     }
 
     /**
@@ -134,6 +179,21 @@ public class MessengerController {
      */
     private void openChatRoom(Room room) {
         // TODO: load message from the room and allow user to return, send new messeage, and show who is in the room
+        
+        currRoom = room;
+        
+        // set up the chat panel
+        List<String> userNames = new ArrayList<String>();
+        for (User user : room.getUsers()) {
+            userNames.add(user.getName());
+        }
+
+        userList.setItems(FXCollections.observableArrayList(userNames));
+        roomLabel.setText(room.getName());
+        for (String msg : room.getContents()) {
+            msgTextDisplay.appendText(msg + "\n");
+        }
+
         mainPane.setVisible(false);
         chatPane.setVisible(true);
     }
@@ -168,6 +228,55 @@ public class MessengerController {
         // TODO: remove user from room and room from user, if room is empty, remove room
     }
 
+    public void disconnect() {
+        // TODO: disconnect user from all the rooms
+        for (Room room : user.getRooms()) {
+            managers.get(room.getName()).disconnect(listener);
+        }
+    }
+
+    // Methods for Chat Panel ---------------------------------------------------
+    @FXML
+    void returnToMain(ActionEvent event) {
+        msgTextInput.clear();
+        msgTextDisplay.clear();
+        currRoom = null;
+
+        chatPane.setVisible(false);
+        mainPane.setVisible(true);
+    }
+
+    @FXML
+    void sendMsg(ActionEvent event) {
+        managers.get(currRoom.getName()).sendMessage(user.getName(), msgTextInput.getText(), 0, currRoom.getPort());
+        msgTextInput.setText("");
+    }
+
+    // Methods for Login Panel ---------------------------------------------------
+    /**
+     * Display the main menu
+     * 
+     * @param user
+     */
+    private void showMainPane() {
+        loginPane.setVisible(false);
+        mainPane.setVisible(true);
+
+        nameLabel.setText(user.getName());
+        
+        // add the rooms to the list view
+        List<Button> roomBtns = new ArrayList<Button>();
+        for (Room room : user.getRooms()) {
+            Button roomBtn = new Button(room.getName());
+            roomBtn.setStyle("-fx-border:none; -fx-background-color:transparent;");         
+            roomBtn.setOnMouseClicked(e -> openChatRoom(room));
+            roomBtn.setMaxWidth(Integer.MAX_VALUE);
+            roomBtns.add(roomBtn);
+        }
+
+        roomList.setItems(FXCollections.observableArrayList(roomBtns));
+    }
+    
     /**
      * Create a new user by input user name and password
      * 
@@ -187,16 +296,5 @@ public class MessengerController {
 
         // if user name not exist, create new user and log in user with the new name and password
         this.login(event);
-    }
-
-    private void sendMessage(String msg, Room room){
-        managers.get(room.getName()).sendMessage(user.getName(), msg, 0, room.getPort());
-    }
-
-    public void disconnect() {
-        // TODO: disconnect user from all the rooms
-        for (Room room : user.getRooms()) {
-            managers.get(room.getName()).disconnect(listener);
-        }
     }
 }
