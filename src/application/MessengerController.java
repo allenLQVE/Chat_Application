@@ -316,6 +316,7 @@ public class MessengerController {
 
         user.removeRoom(roomToDelete);
         roomToDelete.removeUser(user);
+        managers.get(roomToDelete.getName()).disconnect(listener);
 
         if(roomToDelete.getUsers().size() == 0){
             roomDB.remove(roomToDelete);
