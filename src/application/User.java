@@ -8,6 +8,9 @@ import java.util.ArrayList;
  * A class for user, records the user's password for login. Have the rooms the user in and friends the user have.
  */
 public class User implements Serializable {
+    // serialVersionUID should be increase every time the structure of the class is changed
+    private static final long serialVersionUID = 1;
+
     private String name;
     private ArrayList<Room> rooms;
     private String password;

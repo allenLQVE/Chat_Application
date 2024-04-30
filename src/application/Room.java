@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Room implements Serializable {
-	
+	// serialVersionUID should be increase every time the structure of the class is changed
+	private static final long serialVersionUID = 1;
+
 	private String name;
 	private int port;
 	private ArrayList<User> users;
