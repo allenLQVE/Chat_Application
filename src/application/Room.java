@@ -1,19 +1,20 @@
 package application;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Room {
+public class Room implements Serializable {
 	
 	private String name;
 	private int port;
 	private ArrayList<User> users;
 	private ArrayList<String> contents;
 	
-	Room(String name, int port){
+	public Room(String name, int port){
 		this(name, new ArrayList<User>(), new ArrayList<String>(), port);
 	}
 	
-	Room(String name, ArrayList<User> users, ArrayList<String> contents, int port){
+	public Room(String name, ArrayList<User> users, ArrayList<String> contents, int port){
 		this.name = name;
 		this.users = users;
 		this.contents = contents;

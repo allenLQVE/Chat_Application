@@ -1,7 +1,7 @@
 package application;
 
-import static application.SocketMessengerConstants.DISCONNECT_STRING;
-import static application.SocketMessengerConstants.SERVER_PORT;
+import static application.Interface.SocketMessengerConstants.DISCONNECT_STRING;
+import static application.Interface.SocketMessengerConstants.SERVER_PORT;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -9,6 +9,9 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import application.Interface.MessageListener;
+import application.Interface.MessageManager;
 
 public class SocketMessageManager implements MessageManager{
 
@@ -24,7 +27,7 @@ public class SocketMessageManager implements MessageManager{
     }
 
     @Override
-    public void connect(MessageListener listener, int listen_port) {
+    public void connect(MessageListener listener, int listen_port) throws IOException {
         // return if already connected
         if(isConnected){
             return;
@@ -38,7 +41,7 @@ public class SocketMessageManager implements MessageManager{
             serverExcutor.execute(receiver);
             isConnected = true;
         } catch (IOException e) {
-            e.printStackTrace();
+            throw e;
         }
     }
 

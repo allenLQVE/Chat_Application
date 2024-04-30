@@ -1,4 +1,6 @@
-package application;
+package application.Server;
+
+import static application.Interface.SocketMessengerConstants.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -7,7 +9,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.StringTokenizer;
 
-import static application.SocketMessengerConstants.*;
+import application.Interface.MessageListener;
 
 public class MessageReceiver implements Runnable{
     private BufferedReader input;

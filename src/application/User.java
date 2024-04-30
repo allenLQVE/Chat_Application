@@ -1,31 +1,21 @@
 package application;
 
-import java.security.SecureRandom;
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 /**
  * Class: User
  * 
  * A class for user, records the user's password for login. Have the rooms the user in and friends the user have.
  */
-public class User {
-    public static final Random RANDOM = new SecureRandom();
-
+public class User implements Serializable {
     private String name;
     private ArrayList<Room> rooms;
-    private int hashedPassword;
-    private byte[] salt;
+    private String password;
 
     public User(String name, ArrayList<Room> rooms, String password){
         this.name = name;
         this.rooms = rooms;
-
-        // Simple salting and hashing the password may cause collision(Can be implementing with better methods)
-        salt = new byte[16];
-        RANDOM.nextBytes(salt);
-        this.hashedPassword = (password + salt).hashCode();
+        this.password = password;
     }
 
     public User(String name, String password){
@@ -56,19 +46,15 @@ public class User {
         }
     }
     
-    public int getHashedPassword() {
-        return hashedPassword;
-    }
-    
     /**
      * check if the input password equals to the password
      * 
      * @param password
      *          the password that getting checked
-     * @return return true if the password equals hashedPassword after adding salting and hashing
+     * @return return true if the password equals
      */
     public boolean checkPassword(String password){
-        return (password + salt).hashCode() == hashedPassword;
+        return password.equals(this.password);
     }
 
     @Override
@@ -78,7 +64,7 @@ public class User {
         }
 
         User user = (User) obj;
-        return (name == user.getName() && hashedPassword == user.getHashedPassword());
+        return (name == user.getName());
     }
 
     @Override

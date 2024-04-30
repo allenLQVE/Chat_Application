@@ -1,4 +1,4 @@
-package application;
+package application.Interface;
 
 public interface MessageListener {
     /**

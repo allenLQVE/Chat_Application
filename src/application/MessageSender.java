@@ -1,6 +1,6 @@
 package application;
 
-import static application.SocketMessengerConstants.MESSAGE_SEPARATOR;
+import static application.Interface.SocketMessengerConstants.MESSAGE_SEPARATOR;
 
 import java.io.IOException;
 import java.net.Socket;

@@ -1,15 +1,9 @@
-package application;
+package application.Interface;
 
 public interface SocketMessengerConstants {
 
     // address for multicast datagrams
     public static final String MULTICAST_ADDRESS = "239.0.0.1"; // address for testing
-
-    // port for listening for multicast datagrams
-    public static final int MULTICAST_LISTENING_PORT = 5555; // for testing
-
-    // port for sending multicast datagrams
-    public static final int MULTICAST_SENDING_PORT = 5554; // for testing
 
     // port for Socket connections to the server
     public static final int SERVER_PORT = 12345; // for testing

@@ -7,7 +7,6 @@ import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.fxml.FXMLLoader;
 
-
 public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
@@ -20,6 +19,8 @@ public class Main extends Application {
 			primaryStage.setScene(scene);
 			primaryStage.setOnHidden(e -> {
 				controller.disconnect();
+				controller.saveRoomDB();
+				controller.saveUSERDB();
 				System.out.println("exit");
 				Platform.exit();
 			});

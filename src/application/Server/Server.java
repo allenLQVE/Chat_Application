@@ -1,4 +1,6 @@
-package application;
+package application.Server;
+
+import static application.Interface.SocketMessengerConstants.*;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -6,7 +8,7 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static application.SocketMessengerConstants.*;
+import application.Interface.MessageListener;
 // the server for one chat room
 public class Server implements MessageListener{
     private ExecutorService serverExecutor; // excutor for the server

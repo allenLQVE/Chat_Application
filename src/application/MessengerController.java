@@ -1,18 +1,23 @@
 package application;
 
+import java.io.EOFException;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
 
+import application.Interface.MessageListener;
+import application.Interface.MessageManager;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
@@ -23,7 +28,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.BorderPane;
 
 public class MessengerController {
-
     // chat panel components
     @FXML
     private BorderPane chatPane;
@@ -69,13 +73,13 @@ public class MessengerController {
     private MessageListener listener  = new MyMessageListener();
     private Dictionary<String, MessageManager> managers;
 
-    // TODO: array for testing, should be replace by database
     private ArrayList<User> userDB;
     private ArrayList<Room> roomDB;
  
     /**
      * create user and room db for testing
      */
+    @SuppressWarnings("unused")
     private void createDumyDB(){
         User user1 = new User("Allen", "1234");
         User user2 = new User("Bob", "1234");
@@ -108,9 +112,91 @@ public class MessengerController {
      */
     @FXML
     public void initialize() {
+        // load database
+        userDB = new ArrayList<User>();
+        roomDB = new ArrayList<Room>();
+        loadUserDB();
+        loadRoomDB();
+        
         loginPane.setVisible(true);
 
-        createDumyDB();
+        // createDumyDB();
+    }
+
+    /**
+     * load rooms from roomRecord
+     */
+    private void loadRoomDB() {
+        ObjectInputStream inputStream = null;
+        String fileName = "room.records";
+        try {
+            inputStream = new ObjectInputStream(new FileInputStream(fileName));
+
+            while (true) {
+                roomDB.add((Room) inputStream.readObject());
+            }
+        } catch (EOFException e) {
+            // end of file, do nothing
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * load users from userRecord
+     */
+    private void loadUserDB() {
+        ObjectInputStream inputStream = null;
+        String fileName = "user.records";
+        try {
+            inputStream = new ObjectInputStream(new FileInputStream(fileName));
+
+            while (true) {
+                userDB.add((User) inputStream.readObject());
+            }
+        } catch (EOFException e) {
+            // end of file, do nothing
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * save roomDB to a binary file
+     */
+    public void saveRoomDB() {
+        ObjectOutputStream outputStream = null;
+        String fileName = "room.records";
+        try {
+            outputStream = new ObjectOutputStream(new FileOutputStream(fileName));
+
+            for (Room room : roomDB) {
+                outputStream.writeObject(room);
+            }
+
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * save userDB to a binary file
+     */
+    public void saveUSERDB() {
+        ObjectOutputStream outputStream = null;
+        String fileName = "user.records";
+        try {
+            outputStream = new ObjectOutputStream(new FileOutputStream(fileName));
+
+            for (User user : userDB) {
+                outputStream.writeObject(user);
+            }
+
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // Methods for Main Panel ---------------------------------------------------
@@ -133,7 +219,15 @@ public class MessengerController {
             Alert alert = new Alert(AlertType.ERROR, "Incorrect Password!");
             alert.show();
         } else {
-            this.connect();
+            try {
+                this.connect();
+            } catch (Exception e) {
+                user = null;
+                Alert alert = new Alert(AlertType.ERROR, "Server Connectino Failed!");
+                alert.show();
+                return;
+            }
+            
             this.showMainPane();
         }
     }
@@ -148,6 +242,7 @@ public class MessengerController {
     private User login(String userName, String pwd) {
         for (User user : userDB) {
             if(user.getName().equals(userName) && user.checkPassword(pwd)){
+                
                 return user;
             }
         }
@@ -156,29 +251,40 @@ public class MessengerController {
 
     /**
      * connect to the server
+     * @throws Exception 
      */
-    private void connect() {
+    private void connect() throws Exception {
         // connect to mutiple rooms at once
         managers = new Hashtable<String, MessageManager>();
         for (int i = 0; i < user.getRooms().size(); i ++) {
             MessageManager manager = new SocketMessageManager("localhost");
 
-            manager.connect(listener, user.getRooms().get(i).getPort());
+            try {
+                manager.connect(listener, user.getRooms().get(i).getPort());
+            } catch (Exception e) {
+                throw e;
+            }
+            
             managers.put(user.getRooms().get(i).getName(), manager);
         }
     }
 
     /**
      * connect to a room
+     * @throws Exception 
      */
-    private void connect(Room room) {
+    private void connect(Room room) throws Exception {
         if(managers == null){
             managers = new Hashtable<String, MessageManager>();
         }
         
         MessageManager manager = new SocketMessageManager("localhost");
 
-        manager.connect(listener, room.getPort());
+        try {
+            manager.connect(listener, room.getPort());
+        } catch (Exception e) {
+            throw e;
+        }
         managers.put(room.getName(), manager);
     }
 
@@ -196,8 +302,6 @@ public class MessengerController {
                     }
                 }
             }
-            
-            System.out.println(sender + ": " + msg);
         }
         
     }
@@ -273,12 +377,22 @@ public class MessengerController {
             
             user.addRoom(newRoom);
             newRoom.addUser(user);
-            connect(newRoom);
+            try {
+                connect(newRoom);
+            } catch (Exception e) {
+                user.removeRoom(newRoom);
+                newRoom.removeUser(user);
+                
+                Alert alert = new Alert(AlertType.ERROR, "Failed to Connect to the room!");
+                alert.show();
+                return;
+            }
 
             // update main panel
             showMainPane();
         } catch (Exception e) {
-            e.printStackTrace();
+            Alert alert = new Alert(AlertType.ERROR, "Invalid Input!");
+            alert.show();
         } 
     }
 
@@ -330,8 +444,10 @@ public class MessengerController {
      * disconnect user from the server
      */
     public void disconnect() {
-        for (Room room : user.getRooms()) {
-            managers.get(room.getName()).disconnect(listener);
+        if(user != null){
+            for (Room room : user.getRooms()) {
+                managers.get(room.getName()).disconnect(listener);
+            }
         }
     }
 

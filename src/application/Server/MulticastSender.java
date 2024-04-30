@@ -1,8 +1,6 @@
-package application;
+package application.Server;
 
-import static application.SocketMessengerConstants.MULTICAST_ADDRESS;
-// import static application.SocketMessengerConstants.MULTICAST_LISTENING_PORT;
-// import static application.SocketMessengerConstants.MULTICAST_SENDING_PORT;
+import static application.Interface.SocketMessengerConstants.MULTICAST_ADDRESS;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

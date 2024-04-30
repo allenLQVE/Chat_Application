@@ -1,4 +1,6 @@
-package application;
+package application.Interface;
+
+import java.io.IOException;
 
 public interface MessageManager {
     /**
@@ -6,8 +8,9 @@ public interface MessageManager {
      * 
      * @param listener
      * @param listen_port
+     * @throws IOException 
      */
-    public void connect(MessageListener listener, int listen_port);
+    public void connect(MessageListener listener, int listen_port) throws IOException;
 
     /**
      * disconnect from the server and stop routing

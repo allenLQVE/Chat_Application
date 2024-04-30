@@ -1,9 +1,8 @@
 package application;
 
-import static application.SocketMessengerConstants.MESSAGE_SEPARATOR;
-import static application.SocketMessengerConstants.MESSAGE_SIZE;
-import static application.SocketMessengerConstants.MULTICAST_ADDRESS;
-// import static application.SocketMessengerConstants.MULTICAST_LISTENING_PORT;
+import static application.Interface.SocketMessengerConstants.MESSAGE_SEPARATOR;
+import static application.Interface.SocketMessengerConstants.MESSAGE_SIZE;
+import static application.Interface.SocketMessengerConstants.MULTICAST_ADDRESS;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -11,6 +10,8 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
 import java.util.StringTokenizer;
+
+import application.Interface.MessageListener;
 
 public class PacketReceiver implements Runnable{
     private MessageListener listener;
