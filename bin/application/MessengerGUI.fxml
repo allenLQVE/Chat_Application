@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.Label?>
@@ -71,13 +72,6 @@
             </BorderPane>
          </bottom></BorderPane>
       <BorderPane fx:id="mainPane" prefHeight="200.0" prefWidth="200.0" visible="false">
-         <top>
-            <Label fx:id="nameLabel" prefHeight="18.0" prefWidth="612.0" BorderPane.alignment="CENTER">
-               <font>
-                  <Font size="30.0" />
-               </font>
-            </Label>
-         </top>
          <center>
             <ListView fx:id="roomList" prefHeight="354.0" prefWidth="598.0" BorderPane.alignment="CENTER" />
          </center>
@@ -107,6 +101,24 @@
                   </Button>
                </left>
             </BorderPane>
-         </bottom></BorderPane>
+         </bottom>
+         <top>
+            <BorderPane prefHeight="56.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+               <center>
+                  <Label fx:id="nameLabel" prefHeight="46.0" prefWidth="546.0" BorderPane.alignment="CENTER">
+                     <font>
+                        <Font size="30.0" />
+                     </font>
+                  </Label>
+               </center>
+               <right>
+                  <Button fx:id="refreshBtn" contentDisplay="CENTER" mnemonicParsing="false" onAction="#refresh" prefHeight="31.0" prefWidth="74.0" text="Refresh" textAlignment="CENTER" BorderPane.alignment="CENTER">
+                     <BorderPane.margin>
+                        <Insets right="5.0" />
+                     </BorderPane.margin>
+                  </Button>
+               </right>
+            </BorderPane>
+         </top></BorderPane>
    </children>
 </StackPane>

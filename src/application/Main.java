@@ -20,7 +20,7 @@ public class Main extends Application {
 			primaryStage.setOnHidden(e -> {
 				controller.disconnect();
 				controller.saveRoomDB();
-				controller.saveUSERDB();
+				controller.saveUserDB();
 				System.out.println("exit");
 				Platform.exit();
 			});

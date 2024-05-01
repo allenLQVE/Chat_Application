@@ -65,6 +65,8 @@ public class MessengerController {
     private ListView<Button> roomList;
     @FXML
     private Button logOutBtn;
+    @FXML
+    private Button refreshBtn;
 
     private String userName;
     private String pwd;
@@ -80,7 +82,7 @@ public class MessengerController {
      * create user and room db for testing
      */
     @SuppressWarnings("unused")
-    private void createDumyDB(){
+    private void createDummyDB(){
         User user1 = new User("Allen", "1234");
         User user2 = new User("Bob", "1234");
         User user3 = new User("Cirby", "1234");
@@ -113,20 +115,19 @@ public class MessengerController {
     @FXML
     public void initialize() {
         // load database
-        userDB = new ArrayList<User>();
-        roomDB = new ArrayList<Room>();
         loadUserDB();
         loadRoomDB();
         
         loginPane.setVisible(true);
 
-        // createDumyDB();
+        // createDummyDB();
     }
 
     /**
      * load rooms from roomRecord
      */
     private void loadRoomDB() {
+        roomDB = new ArrayList<Room>();
         ObjectInputStream inputStream = null;
         String fileName = "room.records";
         try {
@@ -146,6 +147,7 @@ public class MessengerController {
      * load users from userRecord
      */
     private void loadUserDB() {
+        userDB = new ArrayList<User>();
         ObjectInputStream inputStream = null;
         String fileName = "user.records";
         try {
@@ -183,7 +185,7 @@ public class MessengerController {
     /**
      * save userDB to a binary file
      */
-    public void saveUSERDB() {
+    public void saveUserDB() {
         ObjectOutputStream outputStream = null;
         String fileName = "user.records";
         try {
@@ -291,19 +293,20 @@ public class MessengerController {
     private class MyMessageListener implements MessageListener{
         @Override
         public void messageReceived(String sender, String msg, int send_port, int listen_port) {
+            String content = sender + ": " + msg + "\n";
+
             // if the currRoom is the room receving the msg
             if(currRoom != null && currRoom.getPort() == listen_port){
-                currRoom.addContent(sender + ": " + msg);
-                msgTextDisplay.appendText(sender + ": " + msg + "\n");
+                currRoom.addContent(content);
+                msgTextDisplay.appendText(content + "\n");
             } else {
                 for (Room room : user.getRooms()) {
                     if(room.getPort() == listen_port){
-                        room.addContent(sender + ": " + msg);
+                        room.addContent(content);
                     }
                 }
             }
         }
-        
     }
 
     /**
@@ -311,18 +314,28 @@ public class MessengerController {
      * 
      * @param room
      */
-    private void openChatRoom(Room room) {
-        currRoom = room;
-        
-        // set up the chat panel
-        List<String> userNames = new ArrayList<String>();
-        for (User user : room.getUsers()) {
-            userNames.add(user.getName());
+    private void openChatRoom(int port) {
+        Room roomToOpen = null;
+        for (Room room : roomDB) {
+            if(room.getPort() == port){
+                roomToOpen = room;
+            }
         }
 
+        if(roomToOpen == null){
+            Alert alert = new Alert(AlertType.ERROR, "Failed to open the room!");
+            alert.show();
+            return;
+        }
+
+        currRoom = roomToOpen;
+        
+        // set up the chat panel
+        List<String> userNames = roomToOpen.getUserNames();
+
         userList.setItems(FXCollections.observableArrayList(userNames));
-        roomLabel.setText(room.getName());
-        for (String msg : room.getContents()) {
+        roomLabel.setText(roomToOpen.getName());
+        for (String msg : roomToOpen.getContents()) {
             msgTextDisplay.appendText(msg + "\n");
         }
 
@@ -338,6 +351,7 @@ public class MessengerController {
     @FXML
     void addRoom(ActionEvent event) {
         try {
+            // get user input
             TextInputDialog dialog = new TextInputDialog();
             dialog.setHeaderText("Please enter the port for the room.");
             dialog.setTitle("Add Room");
@@ -350,19 +364,23 @@ public class MessengerController {
             int port = Integer.parseInt(option.get());
 
             Room newRoom = null;
+            // check if the room exist
             for (Room room : roomDB) {
-                // check if the room exist
                 if(room.getPort() == port){
                     newRoom = room;
                 }
             }
 
-            // if room already exist return
-            if(user.getRooms().contains(newRoom)){
-                return;
+            // if room already exist for the user return
+            if(newRoom != null){
+                for (Room room : user.getRooms()) {
+                    if(room.equals(newRoom)){
+                        return;
+                    }
+                }
             }
-
-            // get create a new room and save to DB
+            
+            // if the room is not exist, create a new room and save to DB
             if(newRoom == null){
                 dialog = new TextInputDialog();
                 dialog.setHeaderText("Please enter the name for the room.");
@@ -375,25 +393,43 @@ public class MessengerController {
                 roomDB.add(newRoom);
             }
             
-            user.addRoom(newRoom);
-            newRoom.addUser(user);
             try {
                 connect(newRoom);
             } catch (Exception e) {
-                user.removeRoom(newRoom);
-                newRoom.removeUser(user);
-                
                 Alert alert = new Alert(AlertType.ERROR, "Failed to Connect to the room!");
                 alert.show();
                 return;
             }
 
+            //update the database
+            newRoom.addUser(user);
+            updateDatabase(newRoom);
+            user.addRoom(newRoom); 
+            
             // update main panel
             showMainPane();
         } catch (Exception e) {
+            // e.printStackTrace();
             Alert alert = new Alert(AlertType.ERROR, "Invalid Input!");
             alert.show();
         } 
+    }
+
+    /**
+     * Update the room's info for all users in the room
+     * 
+     * @param room
+     */
+    private void updateDatabase(Room room) {
+        for (String name : room.getUserNames()) {
+            int i = userDB.indexOf(new User(name, ""));
+            if(i != -1){
+                userDB.get(i).removeRoom(room);
+                userDB.get(i).addRoom(room);
+            }
+        }       
+        saveRoomDB();
+        saveUserDB();
     }
 
     /**
@@ -432,8 +468,12 @@ public class MessengerController {
         roomToDelete.removeUser(user);
         managers.get(roomToDelete.getName()).disconnect(listener);
 
-        if(roomToDelete.getUsers().size() == 0){
+        // update database
+        updateDatabase(roomToDelete);
+
+        if(roomToDelete.getUserNames().size() == 0){
             roomDB.remove(roomToDelete);
+            saveRoomDB();
         }
 
         // update main panel
@@ -465,6 +505,21 @@ public class MessengerController {
 
         loginPane.setVisible(true);
         mainPane.setVisible(false);
+    }
+
+    @FXML
+    void refresh(ActionEvent event) {
+        mainPane.setVisible(false);
+        loadRoomDB();
+        loadUserDB();
+
+        for (User upadted_user : userDB) {
+            if(upadted_user.equals(user)){
+                user = upadted_user;
+            }
+        }
+
+        showMainPane();
     }
 
     // Methods for Chat Panel ---------------------------------------------------
@@ -499,7 +554,9 @@ public class MessengerController {
         for (Room room : user.getRooms()) {
             Button roomBtn = new Button(room.toString());
             roomBtn.setStyle("-fx-border:none; -fx-background-color:transparent;");         
-            roomBtn.setOnMouseClicked(e -> openChatRoom(room));
+            roomBtn.setOnMouseClicked(e -> {
+                openChatRoom(room.getPort());
+            });
             roomBtn.setMaxWidth(Integer.MAX_VALUE);
             roomBtns.add(roomBtn);
         }
@@ -537,6 +594,9 @@ public class MessengerController {
         
         // if user name not exist, create new user and log in user with the new name and password
         userDB.add(new User(userName, pwd));
+
+        saveUserDB();
+
         this.login(event);
     }
 }

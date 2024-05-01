@@ -5,35 +5,35 @@ import java.util.ArrayList;
 
 public class Room implements Serializable {
 	// serialVersionUID should be increase every time the structure of the class is changed
-	private static final long serialVersionUID = 1;
+	private static final long serialVersionUID = 2;
 
 	private String name;
 	private int port;
-	private ArrayList<User> users;
+	private ArrayList<String> userNames;
 	private ArrayList<String> contents;
 	
 	public Room(String name, int port){
-		this(name, new ArrayList<User>(), new ArrayList<String>(), port);
+		this(name, new ArrayList<String>(), new ArrayList<String>(), port);
 	}
 	
-	public Room(String name, ArrayList<User> users, ArrayList<String> contents, int port){
+	public Room(String name, ArrayList<String> userNames, ArrayList<String> contents, int port){
 		this.name = name;
-		this.users = users;
+		this.userNames = userNames;
 		this.contents = contents;
 		this.port = port;
 	}
 
-	public ArrayList<User> getUsers() {
-		return users;
+	public ArrayList<String> getUserNames() {
+		return userNames;
 	}
-	public void setUsers(ArrayList<User> users) {
-		this.users = users;
+	public void setUserNames(ArrayList<String> userNames) {
+		this.userNames = userNames;
 	}
 	public void addUser(User user) {
-		this.users.add(user);
+		this.userNames.add(user.getName());
 	}
 	public void removeUser(User user) {
-		this.users.remove(user);
+		this.userNames.remove(user.getName());
 	}
 	
 	public ArrayList<String> getContents() {
