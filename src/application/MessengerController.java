@@ -120,7 +120,7 @@ public class MessengerController {
         
         loginPane.setVisible(true);
 
-        // createDummyDB();
+        createDummyDB();
     }
 
     /**
@@ -427,7 +427,13 @@ public class MessengerController {
                 userDB.get(i).removeRoom(room);
                 userDB.get(i).addRoom(room);
             }
-        }       
+        }
+        for (Room rm : roomDB) {
+            if(rm.equals(room)){
+                rm = room;
+                break;
+            }
+        }   
         saveRoomDB();
         saveUserDB();
     }
@@ -461,7 +467,11 @@ public class MessengerController {
         for (Room room : user.getRooms()) {
             if(room.getName().equals(name) || room.getPort() == port){
                 roomToDelete = room;
+                break;
             }
+        }
+        if(roomToDelete == null){
+            return;
         }
 
         user.removeRoom(roomToDelete);

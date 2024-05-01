@@ -109,6 +109,9 @@
                      <font>
                         <Font size="30.0" />
                      </font>
+                     <BorderPane.margin>
+                        <Insets left="5.0" />
+                     </BorderPane.margin>
                   </Label>
                </center>
                <right>
